@@ -1,34 +1,37 @@
 // ========================================
 // Fichier: display_splash.cpp
-// Version 1.02 - Écran splash au démarrage
-// Module réutilisable
+// Version 1.04 - Ecran splash au demarrage
+// Module reutilisable
+// 
+// CHANGEMENTS v1.04:
+// - Logo Victron mis en commentaire (a remplacer)
 // 
 // Affiche:
-// - Image de fond (341x200 zoomée)
-// - "Répéteur WiFi" (titre principal)
-// - Nom du bateau (paramètre)
-// - Logo Victron (en bas à droite)
-// - Version (en bas à gauche)
+// - Image de fond (341x200 zoomee)
+// - "Repeteur WiFi" (titre principal)
+// - Nom du bateau (parametre)
+// - Logo Victron EN COMMENTAIRE (a remplacer plus tard)
+// - Version (en bas a gauche)
 // ========================================
 #include <Arduino.h>
 #include "display_splash.h"
 #include "config.h"
 
 // ========================================
-// DÉCLARATION DES IMAGES
-// Ces fichiers .c doivent être présents dans le projet
+// DECLARATION DES IMAGES
+// Ces fichiers .c doivent etre presents dans le projet
 // ========================================
 LV_IMG_DECLARE(Splash_screen_vierge341x200TC);  // Image de fond (341x200 pixels)
-LV_IMG_DECLARE(Logo_Victron120x120TC);          // Logo Victron (120x120 pixels)
+// LV_IMG_DECLARE(Logo_Victron120x120TC);          // Logo Victron (120x120 pixels) - COMMENTE v1.04
 
 // ========================================
 // AFFICHAGE SPLASH SCREEN
 // ========================================
 void displaySplash(const char* boat_name, const char* version)
 {
-    Serial.println("[Splash] Affichage écran splash...");
+    Serial.println("[Splash] Affichage Ã©cran splash...");
     
-    // Récupération de l'écran actif LVGL
+    // RÃ©cupÃ©ration de l'Ã©cran actif LVGL
     lv_obj_t *screen = lv_scr_act();
     
     // ========================================
@@ -37,25 +40,28 @@ void displaySplash(const char* boat_name, const char* version)
     lv_obj_set_style_bg_color(screen, lv_color_hex(0x000000), 0);
     
     // ========================================
-    // IMAGE DE FOND (341x200 pixels agrandie à 300%)
+    // IMAGE DE FOND (341x200 pixels agrandie Ã  300%)
     // Zoom 768/256 = 3x
     // ========================================
     lv_obj_t *splash_img = lv_img_create(screen);
     lv_img_set_src(splash_img, &Splash_screen_vierge341x200TC);
-    lv_img_set_zoom(splash_img, 768);  // Zoom à 768/256 = 3x (agrandissement à 300%)
-    lv_obj_center(splash_img);         // Centré sur l'écran
+    lv_img_set_zoom(splash_img, 768);  // Zoom Ã  768/256 = 3x (agrandissement Ã  300%)
+    lv_obj_center(splash_img);         // CentrÃ© sur l'Ã©cran
     
     // ========================================
-    // LOGO VICTRON (120x120 pixels)
+    // LOGO VICTRON (120x120 pixels) - COMMENTE v1.04
     // Position: bas droite avec marge de 30px
+    // A REMPLACER PAR UN AUTRE LOGO PLUS TARD
     // ========================================
+    /*
     lv_obj_t *logo = lv_img_create(screen);
     lv_img_set_src(logo, &Logo_Victron120x120TC);
     lv_obj_align(logo, LV_ALIGN_BOTTOM_RIGHT, -30, -30);
+    */
     
     // ========================================
-    // TITRE: "Répéteur WiFi"
-    // Police Montserrat 48px, blanc, centré, décalé vers le haut
+    // TITRE: "RÃ©pÃ©teur WiFi"
+    // Police Montserrat 48px, blanc, centrÃ©, dÃ©calÃ© vers le haut
     // ========================================
     lv_obj_t *title = lv_label_create(screen);
     lv_label_set_text(title, "Repeteur WiFi");
@@ -65,7 +71,7 @@ void displaySplash(const char* boat_name, const char* version)
     
     // ========================================
     // NOM DU BATEAU
-    // Police Montserrat 48px, blanc, centré
+    // Police Montserrat 48px, blanc, centrÃ©
     // ========================================
     lv_obj_t *boat = lv_label_create(screen);
     lv_label_set_text(boat, boat_name);
@@ -84,13 +90,13 @@ void displaySplash(const char* boat_name, const char* version)
     lv_obj_align(ver, LV_ALIGN_BOTTOM_LEFT, 20, -20);
     
     // ========================================
-    // RAFRAÎCHISSEMENT IMMÉDIAT
+    // RAFRAÃŽCHISSEMENT IMMÃ‰DIAT
     // ========================================
     lv_refr_now(NULL);
     
     // ========================================
     // BOUCLE D'ATTENTE (SPLASH_DURATION_MS)
-    // 60 itérations × 50ms = 3000ms par défaut
+    // 60 itÃ©rations Ã— 50ms = 3000ms par dÃ©faut
     // lv_timer_handler() maintient LVGL actif
     // ========================================
     int iterations = SPLASH_DURATION_MS / 50;
@@ -101,13 +107,13 @@ void displaySplash(const char* boat_name, const char* version)
     
     // ========================================
     // NETTOYAGE: Suppression des objets splash
-    // Libère la mémoire avant l'écran principal
+    // Libere la memoire avant l'ecran principal
     // ========================================
     lv_obj_del(splash_img);
-    lv_obj_del(logo);
+    // lv_obj_del(logo);  // COMMENTE v1.04 - logo non cree
     lv_obj_del(title);
     lv_obj_del(boat);
     lv_obj_del(ver);
     
-    Serial.println("[Splash] ✓ Splash terminé");
+    Serial.println("[Splash] âœ“ Splash terminÃ©");
 }

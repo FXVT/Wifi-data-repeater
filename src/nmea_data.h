@@ -1,7 +1,7 @@
 /*
  * nmea_data.h - Version 1.01
  * 
- * Structures de données pour le répéteur NMEA
+ * Structures de donnÃ©es pour le rÃ©pÃ©teur NMEA
  * Ajout: COG, calcul TWS/TWA/GWD avec COG, gestion heure avec "?"
  */
 
@@ -10,39 +10,39 @@
 
 #include <Arduino.h>
 
-// Structure des données NMEA décodées
+// Structure des donnÃ©es NMEA dÃ©codÃ©es
 struct NmeaData {
-    // Vent apparent (en nœuds et degrés)
+    // Vent apparent (en nÅ“uds et degrÃ©s)
     float windSpeedApparent;      // kts (AWS)
-    float windAngleApparent;      // 0-359° (AWA)
+    float windAngleApparent;      // 0-359Â° (AWA)
     
-    // Vent réel (en nœuds et degrés)
+    // Vent rÃ©el (en nÅ“uds et degrÃ©s)
     float windSpeedTrue;          // kts (TWS)
-    float windAngleTrue;          // 0-359° (TWA)
+    float windAngleTrue;          // 0-359Â° (TWA)
     
     // Vent maximum (vitesses seulement)
     float windSpeedMaxApp;        // kts (MAXW apparent)
-    float windSpeedMaxTrue;       // kts (MAXW réel)
+    float windSpeedMaxTrue;       // kts (MAXW rÃ©el)
     
-    // Navigation (en nœuds et degrés)
-    float heading;                // 0-359° (HDG)
-    float cog;                    // 0-359° (COG - Course Over Ground)
+    // Navigation (en nÅ“uds et degrÃ©s)
+    float heading;                // 0-359Â° (HDG)
+    float cog;                    // 0-359Â° (COG - Course Over Ground)
     float sog;                    // kts (SOG)
     
-    // Profondeur (en mètres)
+    // Profondeur (en mÃ¨tres)
     float depth;                  // m (Prof)
     
     // Batterie
     float batteryVoltage;         // V
-    float batteryCurrent;         // A (AMP, négatif = décharge)
+    float batteryCurrent;         // A (AMP, nÃ©gatif = dÃ©charge)
     uint8_t batterySOC;           // % (SOC)
     
     // Heure
     String utcTime;               // HH:MM:SS ou HH:MM:SS?
-    String lastValidTime;         // Dernière heure valide mémorisée
+    String lastValidTime;         // DerniÃ¨re heure valide mÃ©morisÃ©e
     bool timeIsValid;             // true = heure valide, false = heure douteuse (afficher "?")
     
-    // Flags de validité
+    // Flags de validitÃ©
     bool hasWindApparent;
     bool hasWindTrue;
     bool hasHeading;
@@ -59,7 +59,7 @@ struct NmeaData {
         reset();
     }
     
-    // Reset des données
+    // Reset des donnÃ©es
     void reset() {
         windSpeedApparent = 0.0f;
         windAngleApparent = 0.0f;
@@ -90,15 +90,15 @@ struct NmeaData {
         lastUpdate = 0;
     }
     
-    // Calcul du vent réel (TWS/TWA/GWD) à partir du vent apparent
-    // Méthode: loi des cosinus + trigonométrie
+    // Calcul du vent rÃ©el (TWS/TWA/GWD) Ã  partir du vent apparent
+    // MÃ©thode: loi des cosinus + trigonomÃ©trie
     // Utilise COG (Course Over Ground) au lieu de HDG
     void calculateTrueWind() {
         if (!hasWindApparent || !hasSOG || !hasCOG) {
             return; // Impossible de calculer sans AWS/AWA, SOG et COG
         }
         
-        // Cas spécial: bateau à l'arrêt
+        // Cas spÃ©cial: bateau Ã  l'arrÃªt
         if (sog == 0) {
             windSpeedTrue = windSpeedApparent;
             windAngleTrue = windAngleApparent;
@@ -107,7 +107,7 @@ struct NmeaData {
         }
         
         // ====================================== Calcul de TWS
-        // Formule: TWS² = SOG² + AWS² - 2×SOG×AWS×cos(AWA)
+        // Formule: TWSÂ² = SOGÂ² + AWSÂ² - 2Ã—SOGÃ—AWSÃ—cos(AWA)
         // Source: https://www.yachtd.com/news/trigonometry_and_encryption.html
         float awaRad = windAngleApparent * PI / 180.0f;
         windSpeedTrue = sqrt((sog * sog) + (windSpeedApparent * windSpeedApparent) - 
@@ -119,7 +119,7 @@ struct NmeaData {
                        (windSpeedApparent * windSpeedApparent)) / 
                       (2.0f * windSpeedTrue * sog);
             
-            // Protection contre erreur d'arrondi (F doit être entre -1 et 1 pour acos)
+            // Protection contre erreur d'arrondi (F doit Ãªtre entre -1 et 1 pour acos)
             if (F < -1.0f) {
                 F = -1.0f;
             }
@@ -136,7 +136,7 @@ struct NmeaData {
                 twd = cog + (F * 180.0f / PI);
             }
             
-            // Normaliser TWD (0-359°)
+            // Normaliser TWD (0-359Â°)
             while (twd > 360.0f) twd -= 360.0f;
             while (twd < 0.0f) twd += 360.0f;
             
@@ -160,7 +160,7 @@ struct NmeaData {
             windSpeedMaxApp = windSpeedApparent;
         }
         
-        // Max réel
+        // Max rÃ©el
         if (hasWindTrue && windSpeedTrue > windSpeedMaxTrue) {
             windSpeedMaxTrue = windSpeedTrue;
         }
@@ -171,14 +171,14 @@ struct NmeaData {
         windSpeedMaxApp = windSpeedApparent;
     }
     
-    // Reset du max réel
+    // Reset du max rÃ©el
     void resetWindMaxTrue() {
         windSpeedMaxTrue = windSpeedTrue;
     }
     
     // Calcul de la direction du vent au sol (Ground Wind Direction)
     // GWD = COG + TWA
-    float getGroundWindDirection() {
+    float getGroundWindDirection() const {  // const ajouté pour pouvoir appeler sur const NmeaData*
         if (!hasCOG || !hasWindTrue) {
             return NAN;
         }
@@ -192,7 +192,7 @@ struct NmeaData {
         return gwd;
     }
     
-    // Affichage formaté sur Serial
+    // Affichage formatÃ© sur Serial
     void displaySerial() {
         float gwd = getGroundWindDirection();
         
@@ -220,7 +220,7 @@ struct NmeaData {
     }
 };
 
-// Structure d'un message ASCII N2K parsé
+// Structure d'un message ASCII N2K parsÃ©
 struct N2kMessage {
     char type;                // 'A'
     String timestamp;         // hhmmss.ddd
@@ -228,7 +228,7 @@ struct N2kMessage {
     uint8_t destination;      // DD
     uint8_t priority;         // P
     uint32_t pgn;             // PPPPP (hexa)
-    uint8_t data[223];        // Données (max 223 bytes)
+    uint8_t data[223];        // DonnÃ©es (max 223 bytes)
     int dataLength;           // Nombre de bytes
     
     N2kMessage() {

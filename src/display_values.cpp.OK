@@ -1,0 +1,321 @@
+// ========================================
+// Fichier: display_values.cpp
+// Version 1.04 - Affichage des valeurs numeriques
+// 
+// Gere l'affichage dynamique des donnees NMEA
+// sur l'ecran cree par display_data.cpp
+// 
+// Donnees affichees:
+// - Clock (haut droite): hh:mm:ss + "?" rouge si invalide
+// - Depth (milieu droite): xxx.x m
+// - Amp (bas droite): xx.x A (blanc/orange selon signe)
+// - SOC (bas centre): XXX %
+// - GWD (bas gauche): XXX°
+// - AWS (cadre wind, sous compas): XXX kts
+// - SOG (cadre cog, sous compas): XXX kts
+// ========================================
+#include <Arduino.h>
+#include "display_values.h"
+#include "display_data.h"
+#include "config.h"
+
+// ========================================
+// VARIABLES STATIQUES - LABELS
+// ========================================
+
+// Cadres de droite
+static lv_obj_t *label_clock = nullptr;
+static lv_obj_t *label_clock_invalid = nullptr;  // "?" rouge si heure invalide
+static lv_obj_t *label_depth = nullptr;
+static lv_obj_t *label_amp = nullptr;
+
+// Cadres du bas
+static lv_obj_t *label_gwd = nullptr;
+static lv_obj_t *label_soc = nullptr;
+
+// Sous les compas
+static lv_obj_t *label_aws = nullptr;
+static lv_obj_t *label_sog = nullptr;
+
+// ========================================
+// CREATION DES LABELS
+// ========================================
+
+
+// VERSION DEBUG COMPLETE - A REMPLACER TEMPORAIREMENT
+// Remplacez createDataLabels() ET updateDataValues() par ceci:
+
+void createDataLabels()
+{
+    Serial.println("[Values] === CREATION LABELS DEBUG ===");
+    
+    // CLOCK
+    lv_obj_t *clock_frame = getClockFrame();
+    Serial.printf("[Values] clock_frame @ %p\n", clock_frame);
+    
+    label_clock = lv_label_create(clock_frame);
+    Serial.printf("[Values] label_clock @ %p\n", label_clock);
+    lv_label_set_text(label_clock, "12:34:56");  // VALEUR FORCEE
+    lv_obj_set_style_text_font(label_clock, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_clock, lv_color_hex(0x00FF00), 0);  // VERT pour debug
+    lv_obj_align(label_clock, LV_ALIGN_RIGHT_MID, -15, 0);
+    Serial.println("[Values] CLOCK cree - VERT '12:34:56' aligné droite");
+    
+    // DEPTH
+    lv_obj_t *depth_frame = getDepthFrame();
+    label_depth = lv_label_create(depth_frame);
+    lv_label_set_text(label_depth, "123.4 m");  // VALEUR FORCEE
+    lv_obj_set_style_text_font(label_depth, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_depth, lv_color_hex(0xFF00FF), 0);  // MAGENTA
+    lv_obj_align(label_depth, LV_ALIGN_RIGHT_MID, -15, 0);
+    Serial.println("[Values] DEPTH cree - MAGENTA '123.4 m'");
+    
+    // AMP
+    lv_obj_t *amp_frame = getAmpFrame();
+    label_amp = lv_label_create(amp_frame);
+    lv_label_set_text(label_amp, "-15.3 A");  // VALEUR FORCEE
+    lv_obj_set_style_text_font(label_amp, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_amp, lv_color_hex(0xFFA500), 0);  // ORANGE
+    lv_obj_align(label_amp, LV_ALIGN_RIGHT_MID, -15, 0);
+    Serial.println("[Values] AMP cree - ORANGE '-15.3 A'");
+    
+    // GWD
+    lv_obj_t *gwd_frame = getGwdFrame();
+    label_gwd = lv_label_create(gwd_frame);
+    lv_label_set_text(label_gwd, "245°");  // VALEUR FORCEE
+    lv_obj_set_style_text_font(label_gwd, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_gwd, lv_color_hex(0x00FFFF), 0);  // CYAN
+    lv_obj_align(label_gwd, LV_ALIGN_RIGHT_MID, -15, 0);
+    Serial.println("[Values] GWD cree - CYAN '245°'");
+    
+    // SOC
+    lv_obj_t *soc_frame = getSocFrame();
+    label_soc = lv_label_create(soc_frame);
+    lv_label_set_text(label_soc, "87 %");  // VALEUR FORCEE
+    lv_obj_set_style_text_font(label_soc, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_soc, lv_color_hex(0xFFFF00), 0);  // JAUNE
+    lv_obj_align(label_soc, LV_ALIGN_RIGHT_MID, -15, 0);
+    Serial.println("[Values] SOC cree - JAUNE '87 %'");
+    
+    // AWS
+    lv_obj_t *wind_frame = getWindFrame();
+    label_aws = lv_label_create(wind_frame);
+    lv_label_set_text(label_aws, "12.4 kts");  // VALEUR FORCEE
+    lv_obj_set_style_text_font(label_aws, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_aws, lv_color_hex(0xFF0000), 0);  // ROUGE
+    lv_obj_align(label_aws, LV_ALIGN_BOTTOM_MID, 0, -10);
+    Serial.println("[Values] AWS cree - ROUGE '12.4 kts' en bas");
+    
+    // SOG
+    lv_obj_t *cog_frame = getCogFrame();
+    label_sog = lv_label_create(cog_frame);
+    lv_label_set_text(label_sog, "5.8 kts");  // VALEUR FORCEE
+    lv_obj_set_style_text_font(label_sog, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_sog, lv_color_hex(0x0000FF), 0);  // BLEU
+    lv_obj_align(label_sog, LV_ALIGN_BOTTOM_MID, 0, -10);
+    Serial.println("[Values] SOG cree - BLEU '5.8 kts' en bas");
+    
+    // "?" invalide (caché)
+    label_clock_invalid = lv_label_create(clock_frame);
+    lv_label_set_text(label_clock_invalid, " ?");
+    lv_obj_set_style_text_font(label_clock_invalid, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_clock_invalid, lv_color_hex(0xFF0000), 0);
+    lv_obj_add_flag(label_clock_invalid, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_align_to(label_clock_invalid, label_clock, LV_ALIGN_OUT_RIGHT_MID, 10, 0);
+    
+    lv_refr_now(NULL);
+    
+    Serial.println("[Values] === TOUS LES LABELS CREES AVEC COULEURS DEBUG ===");
+    Serial.println("[Values] Vous devriez voir:");
+    Serial.println("[Values]   - VERT '12:34:56' (haut droite)");
+    Serial.println("[Values]   - MAGENTA '123.4 m' (milieu droite)");
+    Serial.println("[Values]   - ORANGE '-15.3 A' (bas droite)");
+    Serial.println("[Values]   - CYAN '245°' (bas gauche)");
+    Serial.println("[Values]   - JAUNE '87 %' (bas centre)");
+    Serial.println("[Values]   - ROUGE '12.4 kts' (sous compas gauche)");
+    Serial.println("[Values]   - BLEU '5.8 kts' (sous compas centre)");
+    Serial.println("[Values] === FIN DEBUG ===");
+}
+
+void updateDataValues(const NmeaData* data)
+{
+    // Vide pour ce test - les valeurs sont déjà forcées dans createDataLabels
+    Serial.println("[Values] updateDataValues appelé (ignoré en mode debug)");
+}
+
+
+/*
+void createDataLabels()
+{
+    Serial.println("[Values] Creation des labels...");
+    
+    lv_obj_t *screen = lv_scr_act();
+    Serial.printf("[Values] Screen @ %p\n", screen);
+    
+    // ========================================
+    // CLOCK (haut droite)
+    // Parent: clock_frame
+    // Aligné à droite dans le frame
+    // ========================================
+    lv_obj_t *clock_frame = getClockFrame();
+    Serial.printf("[Values] clock_frame @ %p\n", clock_frame);
+    
+    label_clock = lv_label_create(clock_frame);  // ENFANT du frame
+    Serial.printf("[Values] label_clock @ %p\n", label_clock);
+    lv_label_set_text(label_clock, "00:00:00");
+    lv_obj_set_style_text_font(label_clock, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_clock, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_align(label_clock, LV_ALIGN_RIGHT_MID, -15, 0);  // Droite avec marge 15px
+    Serial.println("[Values] label_clock cree");
+    
+    // "?" rouge pour heure invalide (a positionner apres tests)
+    label_clock_invalid = lv_label_create(clock_frame);
+    lv_label_set_text(label_clock_invalid, " ?");
+    lv_obj_set_style_text_font(label_clock_invalid, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_clock_invalid, lv_color_hex(0xFF0000), 0);
+    lv_obj_add_flag(label_clock_invalid, LV_OBJ_FLAG_HIDDEN);  // Cache par defaut
+    lv_obj_align_to(label_clock_invalid, label_clock, LV_ALIGN_OUT_RIGHT_MID, 10, 0);
+    
+    // ========================================
+    // DEPTH (milieu droite) - Enfant de deepth_frame
+    // Aligné à droite
+    // ========================================
+    lv_obj_t *depth_frame = getDepthFrame();
+    label_depth = lv_label_create(depth_frame);
+    lv_label_set_text(label_depth, "0.0 m");
+    lv_obj_set_style_text_font(label_depth, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_depth, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_align(label_depth, LV_ALIGN_RIGHT_MID, -15, 0);
+    
+    // ========================================
+    // AMP (bas droite) - Enfant de amp_frame
+    // Aligné à droite
+    // ========================================
+    lv_obj_t *amp_frame = getAmpFrame();
+    label_amp = lv_label_create(amp_frame);
+    lv_label_set_text(label_amp, "0.0 A");
+    lv_obj_set_style_text_font(label_amp, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_amp, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_align(label_amp, LV_ALIGN_RIGHT_MID, -15, 0);
+    
+    // ========================================
+    // GWD (bas gauche) - Enfant de gwd_frame
+    // Aligné à droite
+    // ========================================
+    lv_obj_t *gwd_frame = getGwdFrame();
+    label_gwd = lv_label_create(gwd_frame);
+    lv_label_set_text(label_gwd, "0°");
+    lv_obj_set_style_text_font(label_gwd, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_gwd, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_align(label_gwd, LV_ALIGN_RIGHT_MID, -15, 0);
+    
+    // ========================================
+    // SOC (bas centre) - Enfant de soc_frame
+    // Aligné à droite
+    // ========================================
+    lv_obj_t *soc_frame = getSocFrame();
+    label_soc = lv_label_create(soc_frame);
+    lv_label_set_text(label_soc, "0 %");
+    lv_obj_set_style_text_font(label_soc, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_soc, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_align(label_soc, LV_ALIGN_RIGHT_MID, -15, 0);
+    
+    // ========================================
+    // AWS (cadre wind, sous compas) - Enfant de wind_frame
+    // ========================================
+    lv_obj_t *wind_frame = getWindFrame();
+    label_aws = lv_label_create(wind_frame);
+    lv_label_set_text(label_aws, "0.0 kts");
+    lv_obj_set_style_text_font(label_aws, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_aws, lv_color_hex(0xFFFFFF), 0);
+    // Position en bas du frame, centré
+    lv_obj_align(label_aws, LV_ALIGN_BOTTOM_MID, 0, -10);
+    
+    // ========================================
+    // SOG (cadre cog, sous compas) - Enfant de cog_frame
+    // ========================================
+    lv_obj_t *cog_frame = getCogFrame();
+    label_sog = lv_label_create(cog_frame);
+    lv_label_set_text(label_sog, "0.0 kts");
+    lv_obj_set_style_text_font(label_sog, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(label_sog, lv_color_hex(0xFFFFFF), 0);
+    // Position en bas du frame, centré
+    lv_obj_align(label_sog, LV_ALIGN_BOTTOM_MID, 0, -10);
+    
+    Serial.println("[Values] Labels crees");
+}
+
+// ========================================
+// MISE A JOUR DES VALEURS
+// ========================================
+void updateDataValues(const NmeaData* data)
+{
+    if (data == nullptr) return;
+    
+    // ========================================
+    // CLOCK
+    // ========================================
+    if (data->hasTime && label_clock != nullptr) {
+        lv_label_set_text(label_clock, data->utcTime.c_str());
+        
+        // Afficher "?" rouge si heure invalide
+        if (label_clock_invalid != nullptr) {
+            if (data->timeIsValid) {
+                lv_obj_add_flag(label_clock_invalid, LV_OBJ_FLAG_HIDDEN);
+            } else {
+                lv_obj_clear_flag(label_clock_invalid, LV_OBJ_FLAG_HIDDEN);
+            }
+        }
+    }
+    
+    // ========================================
+    // DEPTH
+    // ========================================
+    if (data->hasDepth && label_depth != nullptr) {
+        lv_label_set_text_fmt(label_depth, "%.1f m", data->depth);
+    }
+    
+    // ========================================
+    // AMP (blanc si >= 0, orange si < 0)
+    // ========================================
+    if (data->hasBattery && label_amp != nullptr) {
+        lv_label_set_text_fmt(label_amp, "%.1f A", data->batteryCurrent);
+        
+        // Changer couleur selon signe
+        if (data->batteryCurrent < 0) {
+            lv_obj_set_style_text_color(label_amp, lv_color_hex(0xFFA500), 0);  // Orange
+        } else {
+            lv_obj_set_style_text_color(label_amp, lv_color_hex(0xFFFFFF), 0);  // Blanc
+        }
+    }
+    
+    // ========================================
+    // GWD (Ground Wind Direction)
+    // ========================================
+    float gwd = data->getGroundWindDirection();
+    if (!isnan(gwd) && label_gwd != nullptr) {
+        lv_label_set_text_fmt(label_gwd, "%03.0f°", gwd);
+    }
+    
+    // ========================================
+    // SOC (State Of Charge)
+    // ========================================
+    if (data->hasBattery && label_soc != nullptr) {
+        lv_label_set_text_fmt(label_soc, "%d %%", data->batterySOC);
+    }
+    
+    // ========================================
+    // AWS (Apparent Wind Speed)
+    // ========================================
+    if (data->hasWindApparent && label_aws != nullptr) {
+        lv_label_set_text_fmt(label_aws, "%.1f kts", data->windSpeedApparent);
+    }
+    
+    // ========================================
+    // SOG (Speed Over Ground)
+    // ========================================
+    if (data->hasSOG && label_sog != nullptr) {
+        lv_label_set_text_fmt(label_sog, "%.1f kts", data->sog);
+    }
+}
+*/

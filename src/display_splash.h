@@ -1,6 +1,6 @@
 // ========================================
 // Fichier: display_splash.h
-// Version 1.02 - Écran splash au démarrage
+// Version 1.04 - Écran splash au démarrage
 // Module réutilisable
 // ========================================
 #ifndef DISPLAY_SPLASH_H
