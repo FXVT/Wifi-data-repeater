@@ -7,6 +7,6 @@ Les données sont récupérées du réseau NMEA2000 par un répéteur Wifi Actis
 Le tactile est utilisé pour :
 -	Passer en mode veille afin de diminuer la luminosité de l’écran en touchant le centre de l’écran.
 -	Pour remettre à zéro le vent apparent maximum en touchant la zone « xx.x kts MAX »
--	
+
 La programmation a été faite avec l’IDE Arduino v2.3.6 en C++ et LVGL en vibe coding  avec l’assistance d’Antorpic Claude Sonnet 4.5 Pro.
 L’écran de splash et les icones ont été générés par Microsoft Copilot.
