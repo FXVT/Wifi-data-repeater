@@ -1,10 +1,14 @@
 // ========================================
 // Fichier: display_data.h
-// Version 1.04 - Écran principal avec 7 cadres ombrés
+// Version 1.07 - Ajout pictogramme GWD
 // Module réutilisable
 // 
-// CHANGEMENTS v1.04:
+// CHANGEMENTS v1.07:
+// - Ajout pictogramme GWD dans cadre GWD
+// 
+// CHANGEMENTS v1.06:
 // - Ajout constantes de positionnement pour display_values
+// - Ajout accesseur pour triangle girouette (AWA)
 // ========================================
 #ifndef DISPLAY_DATA_H
 #define DISPLAY_DATA_H
@@ -72,5 +76,8 @@ lv_obj_t* getDepthFrame();
 lv_obj_t* getGwdFrame();
 lv_obj_t* getSocFrame();
 lv_obj_t* getAmpFrame();
+
+// Accesseur pour le triangle girouette (AWA)
+lv_obj_t* getWindVaneTriangle();
 
 #endif // DISPLAY_DATA_H
