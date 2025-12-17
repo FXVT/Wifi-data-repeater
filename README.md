@@ -4,6 +4,8 @@ L’idée est d’avoir en un clin d’œil une vue sur les paramètres essentie
 
 Les données sont récupérées du réseau NMEA2000 par un répéteur Wifi Actisense W2K-1. La carte Waveshare capte l’émission Wifi de ce répéteur et les affiche sur un écran unique. Ainsi la carte n’est pas directement reliée au réseau en ne nécessite donc qu’un câblage simple : une alimentation 12V du bord.
 
+![Description de l'image](chemin/vers/votre-image.jpg)
+
 Le W2K-1 est paramétré pour créer un serveur Wifi en UDP émettant les données au format ASCII N2K. Ce format, bien que propriétaire Actisense, a été préféré au classique NMEA0183 qui, sur cet appareil, ne fournit pas de sentence contenant le SOC Batterie et le courant de batterie.
 
 Le tactile de la carte Waveshare est utilisé pour :
