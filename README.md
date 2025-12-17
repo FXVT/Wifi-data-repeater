@@ -8,7 +8,7 @@ Les données sont récupérées du réseau NMEA2000 par un répéteur Wifi Actis
 
 Le W2K-1 est paramétré pour créer un serveur Wifi en UDP émettant les données au format ASCII N2K. Ce format, bien que propriétaire Actisense, a été préféré au classique NMEA0183 qui, sur cet appareil, ne fournit pas de sentence contenant le SOC Batterie et le courant de batterie.
 
-Le tactile de la carte Waveshare est utilisé pour :
+[A vernir] Le tactile de la carte Waveshare est utilisé pour :
 -	Passer en mode veille afin de diminuer la luminosité de l’écran en touchant le centre de l’écran.
 -	Pour remettre à zéro le vent apparent maximum en touchant la zone « xx.x kts MAX »
   
