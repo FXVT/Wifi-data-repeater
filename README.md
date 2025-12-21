@@ -10,9 +10,10 @@ Les données sont récupérées du réseau NMEA2000 par un répéteur Wifi Actis
 
 Le W2K-1 est paramétré pour créer un serveur Wifi en UDP émettant les données au format ASCII N2K. Ce format, bien que propriétaire Actisense, a été préféré au classique NMEA0183 qui, sur cet appareil, ne fournit pas de sentence contenant le SOC Batterie et le courant de batterie.
 
-[A vernir] Le tactile de la carte Waveshare est utilisé pour :
--	Passer en mode veille afin de diminuer la luminosité de l’écran en touchant le centre de l’écran.
--	Pour remettre à zéro le vent apparent maximum en touchant la zone « xx.x kts MAX »
+Le tactile de la carte Waveshare est utilisé pour :
+-	Passer en mode veille afin de diminuer la luminosité de l’écran en touchant le centre de l’écran. Il ne s'agit pas d'un réel mode veille ni d'un ajustement de la luminosité que je n'ai pas trouvé sur cette carte. Il s'ajit juse d'un overlay opaque à 90%.
+-	Remettre à zéro le vent apparent maximum en touchant la zone « xx.x kts MAX »
+-	Modifier le décalage horaire. La valeur est mémorisée dans la NVS de l'ESP32 5 secondes après la dernière pression de touche et pas immédiatement après chaque pression de touche. Cela permet de ne pas user prématurément la NVS en diminuant les cycles d'écriture.
   
 La programmation a été faite avec l’IDE Arduino v2.3.6 en C++ et LVGL en vibe coding avec l’assistance d’Antorpic Claude Sonnet 4.5 Pro.
 L’écran de splash et les icones ont été générés par Microsoft Copilot.
