@@ -344,7 +344,7 @@ const char* FIRMWARE_VERSION = "v1.15";  // Version actuelle
 - **PSRAM** : OPI PSRAM
 - **Upload Speed** : 921600
 
-![paramIDE](photos/Paramétrage IDE Arduino.png)
+![paramIDE](photos/Paramétrage_IDE_Arduino.png)
 
 #### 8. Compiler et téléverser
 
