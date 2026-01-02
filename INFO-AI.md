@@ -344,6 +344,8 @@ const char* FIRMWARE_VERSION = "v1.15";  // Version actuelle
 - **PSRAM** : OPI PSRAM
 - **Upload Speed** : 921600
 
+![splash](photos/IMG_20260102_165440s.jpg)
+
 #### 8. Compiler et téléverser
 
 1. Connecter ESP32 via USB-C
