@@ -1,7 +1,7 @@
 Ce projet est la programmation d’une carte Waveshare ESP32 S3 Touch LCD 5B ( https://www.waveshare.com/esp32-s3-touch-lcd-5.htm )pour l’utiliser comme petit écran répéteur à installer dans une des cabines de notre voilier.
 
 L’idée est d’avoir en un clin d’œil une vue sur les paramètres essentiels lors de la navigation ou au mouillage sans avoir à quitter la cabine pour lire les autres instruments.
-
+![splash](photos/IMG_20260102_165440s.jpg)
 ![répéteur](photos/Resize_20260101_112249_9913.jpg)
 
 Les données sont récupérées du réseau NMEA2000 par un répéteur Wifi Actisense W2K-1. La carte Waveshare capte l’émission Wifi de ce répéteur et les affiche sur un écran unique. Ainsi la carte n’est pas directement reliée au réseau en ne nécessite donc qu’un câblage simple : une alimentation 12V du bord.
